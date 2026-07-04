@@ -1,0 +1,201 @@
+/* ---------------------------------------------------------------
+   Design system — "graph paper / blueprint"
+   Light: engineering graph paper. Dark: blueprint inversion.
+   --------------------------------------------------------------- */
+
+@import '@fontsource/zilla-slab/600.css';
+@import '@fontsource/zilla-slab/700.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+:root {
+  --paper: #f5f5f0;
+  --grid: #e2e3da;
+  --ink: #1c1e26;
+  --accent: #24409e;
+  --graphite: #5a5d66;
+  --rule: #c75146;
+  --surface: #fdfdfa; /* cards/code blocks sit slightly above the paper */
+
+  --font-display: 'Zilla Slab', 'Georgia', serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  /* one grid cell of the graph paper; spacing derives from it */
+  --cell: 1.5rem;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101c33;
+    --grid: #1c2c4d;
+    --ink: #e8eaf2;
+    --accent: #7fa3f0;
+    --graphite: #96a0b5;
+    --rule: #d98e86;
+    --surface: #16233e;
+    color-scheme: dark;
+  }
+}
+
+/* explicit toggle wins over system preference, both directions */
+:root[data-theme='light'] {
+  --paper: #f5f5f0;
+  --grid: #e2e3da;
+  --ink: #1c1e26;
+  --accent: #24409e;
+  --graphite: #5a5d66;
+  --rule: #c75146;
+  --surface: #fdfdfa;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --paper: #101c33;
+  --grid: #1c2c4d;
+  --ink: #e8eaf2;
+  --accent: #7fa3f0;
+  --graphite: #96a0b5;
+  --rule: #d98e86;
+  --surface: #16233e;
+  color-scheme: dark;
+}
+
+/* ---- base ------------------------------------------------------ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background-color: var(--paper);
+  /* the graph paper itself */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 8vw, 4.5rem);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--grid);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- shared utilities ------------------------------------------ */
+
+/* mono eyebrow label above a section, e.g. "SELECTED WORK" */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  display: block;
+  margin-bottom: calc(var(--cell) * 0.75);
+}
+
+/* the red margin rule of a notebook page: hairline only, never a fill */
+.margin-rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  opacity: 0.55;
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* ---- motion ---------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,45 @@
+---
+// The only JavaScript on the site: a light/dark override persisted to localStorage.
+---
+
+<button id="theme-toggle" type="button" aria-label="Toggle color theme">
+  <span aria-hidden="true" class="swatch"></span>
+</button>
+
+<script>
+  const button = document.getElementById('theme-toggle');
+  button?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const current =
+      root.dataset.theme ??
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
+
+<style>
+  button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem;
+    background: none;
+    border: 1px solid var(--grid);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--accent);
+  }
+
+  /* a paper/ink swatch: shows the theme you'd switch into */
+  .swatch {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ink) 50%, var(--paper) 50%);
+    border: 1px solid var(--graphite);
+  }
+</style>

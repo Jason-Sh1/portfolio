@@ -1,0 +1,176 @@
+---
+import '../styles/global.css';
+import { profile } from '../data/profile';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = profile.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <script is:inline>
+      // Set theme before first paint to avoid a flash of the wrong theme.
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.dataset.theme = saved;
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="/">{profile.name}</a>
+      <nav aria-label="Site">
+        <a href="/#work">Projects</a>
+        <a href="/#experience">Experience</a>
+        <a href="/resume.pdf">Resume ↓</a>
+        <ThemeToggle />
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <hr class="margin-rule" />
+      <div class="footer-row">
+        <span class="mono">{profile.email}</span>
+        <span class="mono footer-links">
+          {
+            profile.links.map((link) => (
+              <a href={link.href} rel="me">
+                {link.label}
+              </a>
+            ))
+          }
+          <a href="/resume.pdf">Resume</a>
+        </span>
+      </div>
+      <p class="mono colophon">
+        Set in Zilla Slab &amp; IBM Plex · Built with Astro ·
+        <a href="https://github.com/Jason-Sh1/portfolio">source</a>
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--surface);
+    padding: 0.5rem 1rem;
+    z-index: 10;
+  }
+
+  .skip-link:focus {
+    left: 0.5rem;
+    top: 0.5rem;
+  }
+
+  .site-header,
+  main,
+  .site-footer {
+    max-width: 44rem;
+    margin-inline: auto;
+    padding-inline: calc(var(--cell) * 1);
+  }
+
+  .site-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: calc(var(--cell) * 1.25);
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .wordmark:hover {
+    color: var(--accent);
+  }
+
+  nav {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  nav a {
+    color: var(--graphite);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  main {
+    padding-block: calc(var(--cell) * 1) calc(var(--cell) * 3);
+  }
+
+  .site-footer {
+    padding-block: 0 calc(var(--cell) * 2);
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: var(--cell) 0.25rem;
+    font-size: 0.85rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .footer-links a,
+  .colophon a {
+    color: var(--graphite);
+  }
+
+  .footer-links a:hover,
+  .colophon a:hover {
+    color: var(--accent);
+  }
+
+  .colophon {
+    font-size: 0.75rem;
+    color: var(--graphite);
+    margin: 0;
+  }
+</style>

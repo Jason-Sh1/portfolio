@@ -1,17 +1,129 @@
 ---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PenStroke from '../components/PenStroke.astro';
+import ProjectEntry from '../components/ProjectEntry.astro';
+import { profile, experience, about } from '../data/profile';
 
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base title={`${profile.name} — ${profile.tagline}`}>
+  <section class="hero">
+    <h1>{profile.name}</h1>
+    <PenStroke />
+    <p class="tagline">{profile.tagline}</p>
+    <p class="mono hero-links">
+      {profile.links.map((link) => <a href={link.href} rel="me">{link.label}</a>)}
+    </p>
+  </section>
+
+  <section id="work" aria-labelledby="work-heading">
+    <span class="eyebrow" id="work-heading">Selected work</span>
+    {projects.map((project) => <ProjectEntry project={project} />)}
+  </section>
+
+  <section id="experience" aria-labelledby="experience-heading">
+    <span class="eyebrow" id="experience-heading">Experience</span>
+    <ul class="experience">
+      {
+        experience.map((job) => (
+          <li>
+            <span class="mono period">{job.period}</span>
+            <div>
+              <h3>
+                {job.role} — <span class="org">{job.org}</span>
+              </h3>
+              <p>{job.line}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="about" aria-labelledby="about-heading">
+    <span class="eyebrow" id="about-heading">About</span>
+    {about.map((paragraph) => <p>{paragraph}</p>)}
+    <p>
+      The fastest way to reach me is email:
+      <a href={`mailto:${profile.email}`} class="mono">{profile.email}</a>. Or grab the
+      <a href="/resume.pdf">one-page resume</a>.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: calc(var(--cell) * 2) calc(var(--cell) * 2.5);
+  }
+
+  .tagline {
+    font-size: 1.35rem;
+    max-width: 30ch;
+    line-height: 1.4;
+    margin-block: calc(var(--cell) * 1) calc(var(--cell) * 0.75);
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  section:not(.hero) {
+    padding-block: calc(var(--cell) * 1.5);
+  }
+
+  .experience {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .experience li {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0 var(--cell);
+    padding-block: calc(var(--cell) * 0.75);
+    border-top: 1px solid var(--grid);
+  }
+
+  .experience .period {
+    font-size: 0.85rem;
+    color: var(--graphite);
+    padding-top: 0.25rem;
+  }
+
+  .experience h3 {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .experience .org {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .experience p {
+    margin: 0;
+    color: var(--graphite);
+    font-size: 0.95rem;
+  }
+
+  #about p {
+    max-width: 62ch;
+  }
+
+  @media (max-width: 540px) {
+    .experience li {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>
