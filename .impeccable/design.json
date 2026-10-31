@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T06:30:00Z",
+  "title": "Design System: Jason Shi portfolio",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Sheet White" },
+      "ink": { "role": "neutral", "displayName": "Datasheet Ink" },
+      "ink-2": { "role": "neutral", "displayName": "Secondary Ink" },
+      "ink-3": { "role": "neutral", "displayName": "Footnote Ink" },
+      "hair": { "role": "neutral", "displayName": "Hairline" },
+      "wash": { "role": "neutral", "displayName": "Header Wash" },
+      "signal": { "role": "primary", "displayName": "Signal Vermilion" },
+      "signal-ink": { "role": "on-primary", "displayName": "On Signal" }
+    },
+    "typographyMeta": {
+      "name": { "displayName": "Part Name", "purpose": "Person name and project titles; Archivo at width 125%." },
+      "section-head": { "displayName": "Section Head", "purpose": "Datasheet section headings on a 2px rule; width 78%, uppercase." },
+      "table-head": { "displayName": "Table Head", "purpose": "Column headers on the wash fill." },
+      "body": { "displayName": "Body", "purpose": "Prose and table cells; tabular figures." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "All state transitions and the pin-seat entrance." },
+      { "name": "pin-seat", "value": "520ms, 45ms stagger, scaleX 0.15 to 1", "purpose": "The single authored load moment on the pin configuration." }
+    ],
+    "breakpoints": [
+      { "name": "front-stack", "value": "1000px" },
+      { "name": "tables-stack", "value": "860px" },
+      { "name": "single-column", "value": "560px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Part Tag",
+      "kind": "chip",
+      "refersTo": "part-tag",
+      "description": "Part-number block used in the header band and next to project titles.",
+      "html": "<a class=\"ds-band\" href=\"#\"><span class=\"ds-part\">JS-1</span><span class=\"ds-name\">Jason Shi</span></a>",
+      "css": ".ds-band{display:inline-flex;text-decoration:none;color:var(--ink,#16171a);font:600 0.95rem/1 'Archivo Variable',Arial,sans-serif}.ds-part{background:var(--signal,#d4380f);color:#fff;font-weight:800;font-stretch:125%;padding:.45rem .6rem .4rem}.ds-name{border:1px solid currentColor;border-left:0;padding:.4rem .7rem .35rem;font-stretch:90%}.ds-band:hover .ds-name{background:#16171a;color:#fbfbf9}.ds-band:focus-visible{outline:2px solid #d4380f;outline-offset:3px}"
+    },
+    {
+      "name": "Section Head",
+      "kind": "custom",
+      "refersTo": "section-head",
+      "description": "Datasheet section heading on a heavy rule.",
+      "html": "<h2 class=\"ds-sec\">Measured characteristics</h2>",
+      "css": ".ds-sec{font:750 0.95rem/1.2 'Archivo Variable',Arial,sans-serif;font-stretch:78%;text-transform:uppercase;letter-spacing:.05em;padding-top:.55rem;border-top:2px solid #16171a;margin:0}"
+    },
+    {
+      "name": "Characteristics Table",
+      "kind": "custom",
+      "refersTo": "table-header-cell",
+      "description": "Ruled data table: parameter, conditions, value, unit.",
+      "html": "<table class=\"ds-dt\"><thead><tr><th>Parameter</th><th>Conditions</th><th class=\"r\">Value</th><th>Unit</th></tr></thead><tbody><tr><th>Automated tests</th><td>GitLab CI, every push</td><td class=\"num\">1,600+</td><td>tests</td></tr><tr><th>DB queries per request</th><td>After profiling</td><td class=\"num\">−67</td><td>%</td></tr></tbody></table>",
+      "css": ".ds-dt{border-collapse:collapse;width:100%;font:400 .95rem/1.4 'Archivo Variable',Arial,sans-serif;font-variant-numeric:tabular-nums;color:#16171a}.ds-dt thead th{text-align:left;font-size:.78rem;font-stretch:78%;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#f0f0ec;padding:.5rem .75rem;border-block:1px solid #16171a}.ds-dt tbody th{text-align:left;font-weight:600}.ds-dt td,.ds-dt tbody th{padding:.65rem .75rem;border-bottom:1px solid #d9dadd}.ds-dt .r,.ds-dt .num{text-align:right}.ds-dt .num{font-weight:750;font-stretch:110%;font-size:1.1rem}"
+    },
+    {
+      "name": "Pin",
+      "kind": "nav",
+      "refersTo": "pin-leg",
+      "description": "One pin of the DIP-8 pin configuration; each pin is a link.",
+      "html": "<a class=\"ds-pin\" href=\"#\"><span class=\"lbl\">GitHub</span><span class=\"leg\"></span><span class=\"n\">7</span></a>",
+      "css": ".ds-pin{display:inline-grid;grid-template-columns:auto 1.5rem 1.4rem;align-items:center;text-decoration:none;color:#16171a;font:700 .85rem/1 'Archivo Variable',Arial,sans-serif;font-stretch:80%;text-transform:uppercase;letter-spacing:.06em}.ds-pin .lbl{padding-right:.6rem}.ds-pin .leg{height:.75rem;border:1.5px solid #16171a;border-right:0;background:#fbfbf9;transition:background-color 180ms cubic-bezier(.16,1,.3,1)}.ds-pin .n{font-size:.75rem;color:#6b6f78;text-align:center}.ds-pin:hover,.ds-pin:focus-visible{color:#d4380f}.ds-pin:hover .leg,.ds-pin:focus-visible .leg{background:#d4380f;border-color:#d4380f}"
+    },
+    {
+      "name": "Block Stage",
+      "kind": "custom",
+      "refersTo": "block-stage",
+      "description": "A lettered stage of a functional block diagram.",
+      "html": "<div class=\"ds-stage\"><span class=\"i\">B</span><span class=\"l\">Adaptive planner</span><span class=\"d\">mastery, FSRS</span></div>",
+      "css": ".ds-stage{display:inline-grid;gap:.2rem;padding:.75rem .8rem .85rem;border:1.5px solid #16171a;background:#fbfbf9;min-width:10rem;font-family:'Archivo Variable',Arial,sans-serif}.ds-stage .i{font-size:.7rem;font-weight:700;color:#6b6f78;letter-spacing:.08em}.ds-stage .l{font-weight:700;font-stretch:90%}.ds-stage .d{font-size:.82rem;color:#4a4d55}"
+    },
+    {
+      "name": "Stack Chip",
+      "kind": "chip",
+      "description": "Stack tag on project sheets.",
+      "html": "<span class=\"ds-chip\">FastAPI</span>",
+      "css": ".ds-chip{display:inline-block;font:600 .8rem/1.3 'Archivo Variable',Arial,sans-serif;font-stretch:90%;border:1px solid #d9dadd;padding:.15rem .5rem;color:#16171a}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Component Datasheet",
+    "overview": "The site is an engineering datasheet: Jason is part JS-1, each project is a part with its own sheet, and every claim is a characteristic with a value and a condition. Print-white sheet, near-black ink, ruled tables, condensed caps section heads, one signal vermilion. The signature is the pin configuration, whose pins are the links.",
+    "keyCharacteristics": ["Ruled tables with tabular figures", "Archivo across widths 78% to 125%", "One signal accent, used sparingly", "Square corners, flat print, no shadows", "Pin configuration as navigation"],
+    "rules": [
+      { "name": "Characteristic, not claim", "body": "Every claim carries a number and a condition sourced from the résumé or a repo.", "section": "typography" },
+      { "name": "Scarce signal", "body": "Vermilion marks part numbers, pins, live status, awards, focus, and selection only.", "section": "colors" },
+      { "name": "Rules are depth", "body": "Hierarchy comes from rule weight (3px band, 2px section, 1px table, hairline row), never shadow.", "section": "elevation" }
+    ],
+    "dos": ["Give each project a part code, function line, features, specs, and pipeline.", "Use tabular figures for all data."],
+    "donts": ["Don't add cards, shadows, gradients, or rounded corners.", "Don't add a label above a heading.", "Don't use monospace as decoration."]
+  }
+}

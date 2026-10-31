@@ -1,21 +1,34 @@
 ---
 title: Clarity Cash
+code: CC-1
 date: 2025-11-15
-summary: Budgeting app that connects to real bank accounts through Plaid and separates the spending you can control from the spending you can't. Built with a team of four at Technica 2025.
-tags: [FastAPI, Plaid, Firebase, React, TypeScript]
+order: 6
+function: Budgeting on real bank data that separates fixed from flexible spending
+summary: A financial-literacy web app that connects to real bank accounts through Plaid and separates the spending you can control from the spending you can't. Built by a team of four in 24 hours at Technica 2025.
+status: Hackathon build
+team: Team of 4
+tags: [React, TypeScript, FastAPI, Plaid API, Gemini API, Firebase]
 github: https://github.com/aforti1/clarity-cash
-featured: true
+features:
+  - Connects to bank accounts through the Plaid API and ingests real transaction history, no manual entry
+  - Maps every transaction to structural spending (rent, utilities, minimum payments) or flexible spending
+  - Flags harmful patterns such as recurring fees and cash advances
+  - Computes a single clarity score for any period, served by FastAPI to a React frontend
+specs:
+  - { label: Bank data, value: "Plaid API" }
+  - { label: Storage, value: "Firestore" }
+  - { label: Build time, value: "24 hours" }
+  - { label: Team, value: "4" }
+pipeline:
+  - { label: Bank link, detail: "Plaid" }
+  - { label: Categorize, detail: "structural vs flexible" }
+  - { label: Risk flags }
+  - { label: Clarity score, detail: "FastAPI" }
+  - { label: Dashboard, detail: "React, TypeScript" }
 ---
 
-Most budgeting apps show you *where* your money went. Clarity Cash answers a sharper question: given how you actually spend, what is truly unavoidable versus what you can change?
+Most budgeting apps show you where your money went. Clarity Cash answers a sharper question: given how you actually spend, what is truly unavoidable, and what can you change?
 
-## How it works
+## Contract-first on a 24-hour clock
 
-- **Real transactions.** The app connects to bank accounts through the Plaid API and ingests actual transaction history — no manual entry.
-- **Structural vs. flexible.** A custom category system maps every transaction into *structural* spending (rent, utilities, minimum payments) or *flexible* spending (the part you can act on).
-- **Risk flags.** The scoring logic flags harmful patterns like recurring fees and cash advances.
-- **Clarity score.** The backend computes summary metrics and a single score for the health of your spending over any period, served by a FastAPI API to a React frontend, with Firestore for storage.
-
-## Built at Technica 2025
-
-Clarity Cash was built by a team of four at Technica, the University of Maryland's hackathon. Working as a team on a 24-hour deadline meant contract-first development: we agreed on the API shape early so the backend scoring work and the frontend could move in parallel.
+With four people and one day, we agreed on the API shape first, so the backend scoring and the frontend could move in parallel without waiting on each other.

@@ -1,6 +1,6 @@
 # jasonshi.vercel.app
 
-Personal portfolio. Built with [Astro](https://astro.build), designed as engineering graph paper (blueprint in dark mode), deployed on Vercel.
+Personal portfolio. Built with [Astro](https://astro.build), designed as an engineering component datasheet, deployed on Vercel. Design system: [DESIGN.md](DESIGN.md).
 
 ## Add a project in 3 steps
 
@@ -10,16 +10,26 @@ Personal portfolio. Built with [Astro](https://astro.build), designed as enginee
    ```markdown
    ---
    title: Project Name
-   date: 2026-08-01            # shown as the log date, newest first
-   summary: One or two sentences shown on the homepage. # max 320 chars
+   code: PN-1                  # part number: two capitals, dash, digit
+   date: 2026-08-01
+   order: 7                    # position in the Selected work table
+   function: One line for the selection table   # max 90 chars
+   summary: Two or three sentences for the project sheet. # max 320 chars
+   status: Shipped             # Shipped | In progress | Hackathon build
+   award: 1st Place, Some Hackathon   # optional
    tags: [Python, FastAPI]
    github: https://github.com/Jason-Sh1/repo   # optional
-   demo: https://example.com                   # optional
-   featured: true              # red rule + full treatment on the homepage
-   draft: false                # true = hidden from the site
+   features:
+     - What it does, specifically
+     - Another concrete feature
+   specs:
+     - { label: Database, value: "PostgreSQL" }
+   pipeline:                   # functional block diagram, left to right
+     - { label: Ingest, detail: "RSS" }
+     - { label: Serve, detail: "FastAPI" }
    ---
 
-   The write-up. Structure that works: the problem, how it works, what was hard.
+   The write-up (shown as "Detailed description").
    ```
 
 3. Commit and push to `main`. Vercel rebuilds and deploys automatically.
@@ -30,10 +40,9 @@ The frontmatter is validated at build time (`src/content.config.ts`) — a typo 
 
 | What | Where |
 | --- | --- |
-| Name, tagline, links, experience, about | `src/data/profile.ts` |
-| Colors, fonts, grid background | `src/styles/global.css` |
+| Name, features, pins, measured results, experience, honors, about | `src/data/profile.ts` |
+| Colors, fonts, tables | `src/styles/global.css` (rules in `DESIGN.md`) |
 | Header, footer, meta tags | `src/layouts/Base.astro` |
-| Resume | replace `public/resume.pdf` (export from Overleaf) |
 
 ## Commands
 

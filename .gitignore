@@ -24,3 +24,9 @@ pnpm-debug.log*
 .idea/
 
 .vercel
+
+# design tooling artifacts
+.playwright-mcp/
+.impeccable/review/
+.impeccable/direction-payload.json
+.impeccable/brief-body.md

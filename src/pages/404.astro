@@ -2,29 +2,49 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Page not found — Jason Shi" description="This page doesn't exist.">
-  <section class="notfound">
-    <p class="mono code">404</p>
-    <h1>Not in the notebook.</h1>
-    <p>This page doesn't exist — the link may be old or mistyped.</p>
-    <p class="mono"><a href="/">← Back to the front page</a></p>
+<Base title="Page not found · Jason Shi" description="This page doesn't exist." part="404">
+  <section class="nf">
+    <h1>No such part.</h1>
+    <table class="dt">
+      <tbody>
+        <tr>
+          <th scope="row">Error</th>
+          <td>404, page not found</td>
+        </tr>
+        <tr>
+          <th scope="row">Likely cause</th>
+          <td>An old or mistyped link</td>
+        </tr>
+        <tr>
+          <th scope="row">Recovery</th>
+          <td><a href="/">Go to the front page</a> or <a href="/#work">browse projects</a></td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 </Base>
 
 <style>
-  .notfound {
-    padding-block: calc(var(--cell) * 3);
-  }
-
-  .code {
-    color: var(--rule);
-    font-size: 0.9rem;
-    letter-spacing: 0.14em;
-    margin-bottom: 0.5rem;
+  .nf {
+    padding-block: clamp(3rem, 8vw, 6rem);
+    max-width: 40rem;
   }
 
   h1 {
-    font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 0.75rem;
+    font-size: clamp(2.75rem, 8vw, 5.25rem);
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+  }
+
+  th {
+    text-align: left;
+    width: 9rem;
+  }
+
+  tr:first-child th,
+  tr:first-child td {
+    border-top: 1px solid var(--rule);
   }
 </style>
