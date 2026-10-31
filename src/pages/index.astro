@@ -1,128 +1,543 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import PenStroke from '../components/PenStroke.astro';
-import ProjectEntry from '../components/ProjectEntry.astro';
-import { profile, experience, about } from '../data/profile';
+import PinOut from '../components/PinOut.astro';
+import {
+  profile,
+  features,
+  applications,
+  characteristics,
+  experience,
+  qualifications,
+  about,
+} from '../data/profile';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  (a, b) => a.data.order - b.data.order
 );
+
+const month = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 ---
 
-<Base title={`${profile.name} — ${profile.tagline}`}>
-  <section class="hero">
-    <h1>{profile.name}</h1>
-    <PenStroke />
-    <p class="tagline">{profile.tagline}</p>
-    <p class="mono hero-links">
-      {profile.links.map((link) => <a href={link.href} rel="me">{link.label}</a>)}
+<Base title={`${profile.name} · ${profile.descriptor}`}>
+  <section class="front" aria-labelledby="name">
+    <div class="title-block">
+      <h1 id="name">{profile.name}</h1>
+      <p class="descriptor">{profile.descriptor}</p>
+      <p class="school">{profile.school}</p>
+    </div>
+
+    <div class="fa">
+      <div>
+        <h2 class="sec">Features</h2>
+        <ul class="ticks">{features.map((f) => <li>{f}</li>)}</ul>
+      </div>
+      <div>
+        <h2 class="sec">Applications</h2>
+        <ul class="ticks">{applications.map((a) => <li>{a}</li>)}</ul>
+      </div>
+    </div>
+
+    <div class="pins-col">
+      <h2 class="sec">Pin configuration</h2>
+      <PinOut />
+    </div>
+  </section>
+
+  <section id="work" class="block" aria-labelledby="work-h">
+    <h2 class="sec" id="work-h">Selected work</h2>
+    <table class="dt selection">
+      <thead>
+        <tr>
+          <th scope="col">Part</th>
+          <th scope="col">Project</th>
+          <th scope="col">Function</th>
+          <th scope="col">Status</th>
+          <th scope="col">Stack</th>
+          <th scope="col" class="r">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          projects.map((p, i) => (
+            <tr class:list={{ lead: i === 0 }}>
+              <td class="part-cell">
+                <span class="part">{p.data.code}</span>
+              </td>
+              <th scope="row" class="name-cell">
+                <a href={`/projects/${p.id}/`}>{p.data.title}</a>
+              </th>
+              <td class="fn-cell">{p.data.function}</td>
+              <td class="status-cell">
+                {p.data.award ? (
+                  <span class="award">{p.data.award.split(',')[0]}</span>
+                ) : (
+                  <span class:list={['status', { live: p.data.status === 'In progress' }]}>
+                    {p.data.status}
+                  </span>
+                )}
+              </td>
+              <td class="stack-cell muted">{p.data.tags.slice(0, 3).join(', ')}</td>
+              <td class="date-cell muted r">
+                <time datetime={p.data.date.toISOString().slice(0, 10)}>{month(p.data.date)}</time>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p class="footnote">Select a project for its full datasheet: features, specifications, and block diagram.</p>
+  </section>
+
+  <section id="results" class="block" aria-labelledby="results-h">
+    <h2 class="sec" id="results-h">Measured characteristics</h2>
+    <p class="sub">
+      Project portfolio tracker, built and launched as a Software Engineer Intern at Leidos.{' '}
+      <span class="muted">FastAPI, async SQLAlchemy, React, PostgreSQL on Azure.</span>
+    </p>
+    <table class="dt chars">
+      <thead>
+        <tr>
+          <th scope="col">Parameter</th>
+          <th scope="col">Conditions</th>
+          <th scope="col" class="r">Value<sup>1</sup></th>
+          <th scope="col">Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          characteristics.map((c) => (
+            <tr>
+              <th scope="row">
+                {c.param}
+                <span class="cond-m">{c.cond}</span>
+              </th>
+              <td class="muted">{c.cond}</td>
+              <td class="num">{c.value}</td>
+              <td class="muted unit">{c.unit}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p class="footnote">
+      <sup>1</sup> Measured at Leidos, May 2026 to now. Deployed to a private NIST 800-171 Azure environment with
+      Microsoft Entra single sign-on and role-based access.
     </p>
   </section>
 
-  <section id="work" aria-labelledby="work-heading">
-    <span class="eyebrow" id="work-heading">Selected work</span>
-    {projects.map((project) => <ProjectEntry project={project} />)}
-  </section>
-
-  <section id="experience" aria-labelledby="experience-heading">
-    <span class="eyebrow" id="experience-heading">Experience</span>
-    <ul class="experience">
+  <section id="experience" class="block" aria-labelledby="exp-h">
+    <h2 class="sec" id="exp-h">Revision history</h2>
+    <ol class="revs">
       {
-        experience.map((job) => (
-          <li>
-            <span class="mono period">{job.period}</span>
-            <div>
+        experience.map((job, i) => (
+          <li class:list={['rev', { current: i === 0 }]}>
+            <p class="rev-period">{job.period}</p>
+            <div class="rev-body">
               <h3>
-                {job.role} — <span class="org">{job.org}</span>
+                {job.role}
+                <span class="rev-org">
+                  {job.org} · {job.place}
+                </span>
               </h3>
-              <p>{job.line}</p>
+              <ul class="ticks rev-notes">{job.notes.map((n) => <li>{n}</li>)}</ul>
             </div>
           </li>
         ))
       }
-    </ul>
+    </ol>
   </section>
 
-  <section id="about" aria-labelledby="about-heading">
-    <span class="eyebrow" id="about-heading">About</span>
-    {about.map((paragraph) => <p>{paragraph}</p>)}
-    <p>
-      The fastest way to reach me is email:
-      <a href={`mailto:${profile.email}`} class="mono">{profile.email}</a>.
-    </p>
+  <section id="qualifications" class="block split" aria-labelledby="qual-h">
+    <div>
+      <h2 class="sec" id="qual-h">Qualifications</h2>
+      <table class="dt quals">
+        <tbody>
+          {
+            qualifications.map((q) => (
+              <tr>
+                <td class="q-result">{q.result}</td>
+                <th scope="row">{q.event}</th>
+                <td class="muted">{q.note}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <div id="about">
+      <h2 class="sec">General description</h2>
+      {about.map((p) => <p>{p}</p>)}
+    </div>
   </section>
 </Base>
 
 <style>
-  .hero {
-    padding-block: calc(var(--cell) * 2) calc(var(--cell) * 2.5);
+  /* ---- Front page ---- */
+  .front {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 22rem);
+    grid-template-areas:
+      'title title'
+      'fa pins';
+    gap: 2.25rem var(--gap);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 6vw, 4.5rem);
   }
 
-  .tagline {
-    font-size: 1.35rem;
-    max-width: 30ch;
-    line-height: 1.4;
-    margin-block: calc(var(--cell) * 1) calc(var(--cell) * 0.75);
+  .title-block {
+    grid-area: title;
   }
 
-  .hero-links {
-    display: flex;
-    gap: 1.5rem;
-    font-size: 0.9rem;
+  .fa {
+    grid-area: fa;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--gap);
+    align-self: start;
+  }
+
+  .pins-col {
+    grid-area: pins;
+    align-self: start;
+  }
+
+  h1 {
+    font-size: clamp(3.25rem, 9.5vw, 6rem);
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.92;
+    margin-bottom: 1.1rem;
+  }
+
+  .descriptor {
+    font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    max-width: 26ch;
+    margin-bottom: 0.6rem;
+  }
+
+  .school {
+    color: var(--ink-2);
     margin: 0;
   }
 
-  section:not(.hero) {
-    padding-block: calc(var(--cell) * 1.5);
+  .fa .ticks li {
+    font-size: 0.98rem;
   }
 
-  .experience {
+  /* ---- Blocks ---- */
+  .block {
+    padding-block: 1.5rem 3.5rem;
+  }
+
+  .sub {
+    max-width: 70ch;
+    margin-bottom: 1.25rem;
+  }
+
+  .muted {
+    color: var(--ink-2);
+  }
+
+  .r {
+    text-align: right;
+  }
+
+  /* Selection table */
+  .selection .part {
+    font-size: 0.9rem;
+  }
+
+  .selection .name-cell {
+    font-weight: 700;
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+
+  .selection .name-cell a {
+    text-decoration-color: var(--hair);
+    text-decoration-thickness: 2px;
+  }
+
+  .selection .name-cell a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .selection tr.lead .part {
+    background: var(--signal);
+    color: var(--signal-ink);
+    padding: 0.15rem 0.35rem;
+    margin-left: -0.35rem;
+  }
+
+  .selection .fn-cell {
+    max-width: 30ch;
+  }
+
+  .selection .status-cell {
+    white-space: nowrap;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .status.live::before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--signal);
+    margin-right: 0.4rem;
+    vertical-align: 0.05em;
+  }
+
+  .award {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .selection .stack-cell,
+  .selection .date-cell {
+    font-size: 0.88rem;
+  }
+
+  .selection .date-cell {
+    white-space: nowrap;
+  }
+
+  .selection th[scope='row'] {
+    text-align: left;
+  }
+
+  /* Characteristics */
+  .chars th[scope='row'] {
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .chars .num {
+    font-size: 1.15rem;
+    font-stretch: 110%;
+    font-weight: 750;
+  }
+
+  .chars .unit {
+    width: 6rem;
+  }
+
+  .cond-m {
+    display: none;
+  }
+
+  /* Revision history */
+  .revs {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .experience li {
+  .rev {
     display: grid;
-    grid-template-columns: 6.5rem 1fr;
-    gap: 0 var(--cell);
-    padding-block: calc(var(--cell) * 0.75);
-    border-top: 1px solid var(--grid);
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 0.25rem var(--gap);
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--hair);
   }
 
-  .experience .period {
-    font-size: 0.85rem;
-    color: var(--graphite);
-    padding-top: 0.25rem;
+  .rev:last-child {
+    border-bottom-color: var(--rule);
   }
 
-  .experience h3 {
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-  }
-
-  .experience .org {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .experience p {
+  .rev-period {
+    font-weight: 650;
+    font-size: 0.92rem;
     margin: 0;
-    color: var(--graphite);
-    font-size: 0.95rem;
+    padding-top: 0.15rem;
+  }
+
+  .rev.current .rev-period {
+    color: var(--signal);
+  }
+
+  .rev h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  .rev-org {
+    display: block;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin-top: 0.15rem;
+  }
+
+  .rev-notes {
+    max-width: 72ch;
+  }
+
+  .rev-notes li {
+    font-size: 0.98rem;
+  }
+
+  .rev-notes li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Qualifications + description */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--gap);
+  }
+
+  .quals td,
+  .quals th {
+    padding-block: 0.6rem;
+  }
+
+  .quals tr:first-child td,
+  .quals tr:first-child th {
+    border-top: 1px solid var(--rule);
+  }
+
+  .quals th {
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .q-result {
+    font-weight: 750;
+    font-stretch: 110%;
+    white-space: nowrap;
+    width: 7rem;
   }
 
   #about p {
     max-width: 62ch;
   }
 
-  @media (max-width: 540px) {
-    .experience li {
-      grid-template-columns: 1fr;
-      gap: 0.2rem;
+  /* ---- Responsive ---- */
+  @media (max-width: 1000px) {
+    .front {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'title' 'fa' 'pins';
+    }
+
+    .pins-col {
+      max-width: 26rem;
+    }
+
+    .rev {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+
+    .split {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+  }
+
+  @media (max-width: 860px) {
+    /* Selection table becomes stacked entries. */
+    .selection thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .selection,
+    .selection tbody,
+    .selection tr,
+    .selection td,
+    .selection th {
+      display: block;
+    }
+
+    .selection tr {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.2rem 0.75rem;
+      padding-block: 0.9rem;
+      border-bottom: 1px solid var(--hair);
+    }
+
+    .selection tbody tr:first-child {
+      border-top: 1px solid var(--rule);
+    }
+
+    .selection td,
+    .selection th {
+      padding: 0;
+      border: 0 !important;
+    }
+
+    .selection .part-cell {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+    }
+
+    .selection .name-cell {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .selection .date-cell {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: center;
+    }
+
+    .selection .fn-cell,
+    .selection .status-cell,
+    .selection .stack-cell {
+      grid-column: 1 / -1;
+      max-width: none;
+    }
+
+    .selection .status-cell {
+      white-space: normal;
+    }
+
+    .fa {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .chars thead th:nth-child(2),
+    .chars td:nth-child(2) {
+      display: none;
+    }
+
+    .cond-m {
+      display: block;
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: var(--ink-2);
+      margin-top: 0.1rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .rev {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .chars .unit {
+      width: auto;
+    }
+
+    .dt td,
+    .dt th {
+      padding-inline: 0.5rem;
     }
   }
 </style>

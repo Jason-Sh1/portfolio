@@ -1,120 +1,268 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import BlockDiagram from '../../components/BlockDiagram.astro';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects', ({ data }) => !data.draft);
-  return projects.map((project) => ({
+  const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+    (a, b) => a.data.order - b.data.order
+  );
+  return projects.map((project, i) => ({
     params: { slug: project.id },
-    props: { project },
+    props: { project, next: projects[(i + 1) % projects.length] },
   }));
 }
 
-const { project } = Astro.props;
-const { title, date, summary, tags, github, demo } = project.data;
+const { project, next } = Astro.props;
+const { title, code, date, summary, status, award, team, tags, github, demo, features, specs, pipeline } =
+  project.data;
 const { Content } = await render(project);
 
-const logDate = date.toISOString().slice(0, 7);
+const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const rows = [
+  { label: 'Status', value: status },
+  ...(award ? [{ label: 'Result', value: award }] : []),
+  ...(team ? [{ label: 'Team', value: team }] : []),
+  { label: 'Date', value: month },
+  ...specs,
+];
 ---
 
-<Base title={`${title} — Jason Shi`} description={summary}>
+<Base title={`${title} (${code}) · Jason Shi`} description={summary} part={code}>
   <article>
-    <header class="project-header">
-      <p class="mono breadcrumb">
-        <a href="/#work">← Selected work</a>
-      </p>
-      <p class="mono date">
-        <time datetime={date.toISOString().slice(0, 10)}>{logDate}</time>
-      </p>
-      <h1>{title}</h1>
+    <header class="head">
+      <p class="crumb"><a href="/#work">All projects</a></p>
+      <div class="title-row">
+        <h1>{title}</h1>
+        <span class="code part">{code}</span>
+      </div>
       <p class="summary">{summary}</p>
-      <p class="mono meta">
-        {tags.map((tag) => <span class="tag">{tag}</span>)}
-      </p>
-      <p class="mono links">
-        {github && <a href={github}>GitHub ↗</a>}
-        {demo && <a href={demo}>Live ↗</a>}
-      </p>
-      <hr class="margin-rule" />
+      <div class="meta">
+        <ul class="stack" aria-label="Stack">{tags.map((t) => <li>{t}</li>)}</ul>
+        <p class="links">
+          {github && <a href={github}>Repository</a>}
+          {demo && <a href={demo}>Live demo</a>}
+          {!github && !demo && <span class="muted">No public repository</span>}
+        </p>
+      </div>
     </header>
 
-    <div class="prose">
-      <Content />
-    </div>
+    <section class="pair">
+      <div>
+        <h2 class="sec">Features</h2>
+        <ul class="ticks feats">{features.map((f) => <li>{f}</li>)}</ul>
+      </div>
+      <div>
+        <h2 class="sec">Specifications</h2>
+        <table class="dt specs">
+          <tbody>
+            {
+              rows.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}</th>
+                  <td class:list={{ hot: r.value === 'In progress', strong: r.label === 'Result' }}>{r.value}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="diagram-block">
+      <h2 class="sec">Functional block diagram</h2>
+      <BlockDiagram stages={pipeline} title={title} />
+    </section>
+
+    <section class="detail">
+      <h2 class="sec">Detailed description</h2>
+      <div class="prose">
+        <Content />
+      </div>
+    </section>
+
+    <nav class="next" aria-label="Next project">
+      <a href={`/projects/${next.id}/`}>
+        <span class="next-t">
+          <span class="part">{next.data.code}</span>
+          {next.data.title}
+          <svg class="next-arrow" viewBox="0 0 32 16" aria-hidden="true">
+            <path d="M0 8h28" stroke="currentColor" stroke-width="2" fill="none"></path>
+            <path d="M22 2l8 6-8 6" stroke="currentColor" stroke-width="2" fill="none"></path>
+          </svg>
+        </span>
+      </a>
+    </nav>
   </article>
 </Base>
 
 <style>
-  .project-header {
-    padding-block: var(--cell) 0;
+  .head {
+    padding-block: 2rem 2.5rem;
   }
 
-  .breadcrumb {
+  .crumb {
     font-size: 0.85rem;
-    margin-bottom: calc(var(--cell) * 1.5);
+    font-weight: 600;
+    font-stretch: 85%;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2rem;
   }
 
-  .breadcrumb a {
-    color: var(--graphite);
+  .crumb a {
     text-decoration: none;
   }
 
-  .breadcrumb a:hover {
-    color: var(--accent);
-    text-decoration: underline;
+  .crumb a::before {
+    content: '';
+    display: inline-block;
+    width: 0.9rem;
+    height: 2px;
+    background: currentColor;
+    margin-right: 0.5rem;
+    vertical-align: 0.3em;
   }
 
-  .date {
-    font-size: 0.85rem;
-    color: var(--graphite);
-    margin-bottom: 0.5rem;
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-bottom: 1rem;
   }
 
   h1 {
-    font-size: clamp(2.25rem, 6vw, 3.25rem);
-    margin-bottom: 0.75rem;
+    font-size: clamp(2.75rem, 8vw, 5.25rem);
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+
+  .code {
+    background: var(--signal);
+    color: var(--signal-ink);
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    padding: 0.25rem 0.5rem 0.2rem;
+    transform: translateY(-0.4em);
   }
 
   .summary {
-    font-size: 1.15rem;
-    color: var(--graphite);
-    max-width: 56ch;
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    line-height: 1.45;
+    max-width: 62ch;
+    margin-bottom: 1.5rem;
   }
 
   .meta {
-    font-size: 0.78rem;
-    color: var(--graphite);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    border-top: 1px solid var(--hair);
+    padding-top: 0.85rem;
+  }
+
+  .stack {
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 0.9rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .tag::before {
-    content: '·';
-    margin-right: 0.9rem;
-  }
-
-  .tag:first-child::before {
-    content: none;
+    gap: 0.35rem 0.4rem;
     margin: 0;
+    padding: 0;
+  }
+
+  .stack li {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-stretch: 90%;
+    border: 1px solid var(--hair);
+    padding: 0.15rem 0.5rem;
   }
 
   .links {
     display: flex;
     gap: 1.25rem;
-    font-size: 0.9rem;
-    margin-bottom: var(--cell);
+    margin: 0;
+    font-weight: 650;
+  }
+
+  .links a {
+    text-decoration-color: var(--ink);
+    text-decoration-thickness: 2px;
+  }
+
+  .muted {
+    color: var(--ink-2);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--gap);
+    padding-bottom: 3rem;
+  }
+
+  .feats li {
+    margin-bottom: 0.75rem;
+  }
+
+  .specs th {
+    font-size: 0.78rem;
+    font-stretch: 78%;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 38%;
+    white-space: normal;
+    vertical-align: top;
+    padding-top: 0.75rem;
+  }
+
+  .specs tr:first-child th,
+  .specs tr:first-child td {
+    border-top: 1px solid var(--rule);
+  }
+
+  .specs tbody tr:last-child th {
+    border-bottom-color: var(--rule);
+  }
+
+  .specs td {
+    font-weight: 550;
+  }
+
+  .specs td.strong {
+    font-weight: 700;
+  }
+
+  .specs td.hot {
+    color: var(--signal);
+    font-weight: 700;
+  }
+
+  .diagram-block {
+    padding-bottom: 3rem;
+  }
+
+  .detail {
+    padding-bottom: 3rem;
   }
 
   .prose {
-    padding-block: var(--cell);
-    max-width: 62ch;
+    max-width: 68ch;
   }
 
   .prose :global(h2) {
-    font-size: 1.4rem;
-    margin-block: calc(var(--cell) * 1.25) 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-block: 2rem 0.6rem;
+  }
+
+  .prose :global(h2:first-child) {
+    margin-top: 0;
   }
 
   .prose :global(ul) {
@@ -123,5 +271,56 @@ const logDate = date.toISOString().slice(0, 7);
 
   .prose :global(li) {
     margin-bottom: 0.5rem;
+  }
+
+  .prose :global(li::marker) {
+    color: var(--signal);
+  }
+
+  .next a {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1.25rem 0 1.5rem;
+    border-top: 2px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .next-t {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    font-weight: 750;
+    font-stretch: 115%;
+    letter-spacing: -0.02em;
+  }
+
+  .next-arrow {
+    width: 0.9em;
+    height: 0.45em;
+    align-self: center;
+    transition: translate 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .next a:hover .next-arrow {
+    translate: 0.2em 0;
+  }
+
+  .next-t .part {
+    font-size: 0.5em;
+    color: var(--signal);
+  }
+
+  .next a:hover .next-t {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.15em;
+  }
+
+  @media (max-width: 860px) {
+    .pair {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
   }
 </style>

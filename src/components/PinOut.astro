@@ -1,0 +1,241 @@
+---
+// 8-pin DIP drawn in HTML so every pin is a real, focusable link.
+import { pins, profile } from '../data/profile';
+
+const left = pins.filter((p) => p.n <= 4).sort((a, b) => a.n - b.n);
+const right = pins.filter((p) => p.n > 4).sort((a, b) => b.n - a.n);
+const isExternal = (href: string) => href.startsWith('http');
+---
+
+<figure class="pinout" aria-labelledby="pinout-cap">
+  <div class="chip">
+    <ul class="pins left" role="list">
+      {
+        left.map((p, i) => (
+          <li style={`--i:${i}`}>
+            <a href={p.href} rel={isExternal(p.href) ? 'me' : undefined}>
+              <span class="lbl">{p.label}</span>
+              <span class="leg" aria-hidden="true" />
+              <span class="n" aria-hidden="true">{p.n}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="body" aria-hidden="true">
+      <span class="notch"></span>
+      <span class="dot"></span>
+      <span class="mark">
+        <span class="mark-part">{profile.part}</span>
+        <span class="mark-name">J. SHI</span>
+      </span>
+    </div>
+    <ul class="pins right" role="list">
+      {
+        right.map((p, i) => (
+          <li style={`--i:${i + 4}`}>
+            <a href={p.href} rel={isExternal(p.href) ? 'me' : undefined}>
+              <span class="n" aria-hidden="true">{p.n}</span>
+              <span class="leg" aria-hidden="true" />
+              <span class="lbl">{p.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <figcaption id="pinout-cap" class="footnote">DIP-8, top view. Every pin is a link.</figcaption>
+</figure>
+
+<style>
+  .pinout {
+    margin: 0;
+    --row: 2.75rem;
+    --leg: 1.5rem;
+    --body: 7.5rem;
+  }
+
+  .chip {
+    display: grid;
+    grid-template-columns: 1fr var(--body) 1fr;
+    align-items: stretch;
+    padding-block: 0.75rem;
+  }
+
+  .pins {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    display: grid;
+    grid-auto-rows: var(--row);
+  }
+
+  .pins a {
+    display: grid;
+    align-items: center;
+    height: 100%;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-stretch: 80%;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+  }
+
+  .left a {
+    grid-template-columns: 1fr var(--leg) 1.4rem;
+  }
+
+  .right a {
+    grid-template-columns: 1.4rem var(--leg) 1fr;
+  }
+
+  .left .lbl {
+    text-align: right;
+    padding-right: 0.6rem;
+  }
+
+  .right .lbl {
+    padding-left: 0.6rem;
+  }
+
+  .n {
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-stretch: 100%;
+    color: var(--ink-3);
+    text-align: center;
+    letter-spacing: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Pin numbers sit inside the package outline. */
+  .left .n {
+    transform: translateX(100%);
+  }
+
+  .right .n {
+    transform: translateX(-100%);
+  }
+
+  .leg {
+    height: 0.75rem;
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    transform-origin: var(--origin);
+    transition:
+      background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .left .leg {
+    --origin: right center;
+    border-right: 0;
+  }
+
+  .right .leg {
+    --origin: left center;
+    border-left: 0;
+  }
+
+  .pins a:hover,
+  .pins a:focus-visible {
+    color: var(--signal);
+  }
+
+  .pins a:hover .leg,
+  .pins a:focus-visible .leg {
+    background: var(--signal);
+    border-color: var(--signal);
+  }
+
+  .pins a:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .body {
+    position: relative;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    display: grid;
+    place-items: center;
+  }
+
+  .notch {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 1.5rem;
+    height: 0.75rem;
+    translate: -50% 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-top: 0;
+    border-radius: 0 0 1.5rem 1.5rem;
+  }
+
+  .dot {
+    position: absolute;
+    top: 1rem;
+    left: 0.85rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--signal);
+  }
+
+  .mark {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .mark-part {
+    font-size: 1.6rem;
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .mark-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    opacity: 0.75;
+  }
+
+  /* The one authored moment: legs seat into the package on load. */
+  @media (prefers-reduced-motion: no-preference) {
+    .leg {
+      animation: seat 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(120ms + var(--i, 0) * 45ms);
+    }
+
+    @keyframes seat {
+      from {
+        transform: scaleX(0.15);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+  }
+
+  @media (max-width: 420px) {
+    .pinout {
+      --body: 5.5rem;
+      --leg: 1.1rem;
+    }
+
+    .pins a {
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+    }
+  }
+</style>
